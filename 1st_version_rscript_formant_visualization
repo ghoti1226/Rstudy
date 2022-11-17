@@ -1,0 +1,39 @@
+library(ggdist)
+library(ggrepel)
+library(tidyverse)
+
+raw <- read_delim("data/total_time.csv")
+raw$Seg <- factor(raw$Seg, levels = c("i", "e", "a", "o", "u", "ai", "au", "ae"))
+
+raw_filtered <- raw |> group_by(Speaker, Seg, t) |>
+  mutate(F1 = ifelse(F1 > (mean(F1) - 2*sd(F1, na.rm = T)) & F1 < (mean(F1) + 2*sd(F1, na.rm = T)), F1, NA),
+         F2 = ifelse(F2 > (mean(F2) - 2*sd(F2, na.rm = T)) & F2 < (mean(F2) + 2*sd(F2, na.rm = T)), F2, NA),
+         F3 = ifelse(F3 > (mean(F3) - 2*sd(F3, na.rm = T)) & F3 < (mean(F3) + 2*sd(F3, na.rm = T)), F3, NA)
+  ) 
+
+ggplot(raw_filtered, aes(t, F2)) +
+  geom_point(color = "turquoise3", color = 0.2, position = position_jitter(width = 0.2), shape = 19) +
+  geom_point(aes(y = F1), color = "orange", color = 0.2, position = position_jitter(width = 0.2), shape = 18) +
+  geom_smooth(aes(color = Seg), linetype = 1, method = "gam") +
+  geom_smooth(aes(y = F1, color = Seg), linetype = 2, method = "gam") +
+  scale_x_continuous(n.breaks = 5) +
+  scale_color_viridis_d(end = 0.8) +
+  facet_wrap(. ~ Seg, nrow = 2) +
+  theme_ggdist() +
+  labs(title = "figure01") +
+  theme(legend.position = "none")
+ggsave("figs/vwls.png")
+
+ggplot(raw, aes(t, F2)) +
+  geom_point(color = "cyan", color = 0.2, position = position_jitter(width = 0.2), shape = 1) +
+  geom_point(aes(y = F1), color = "brown", color = 0.2, position = position_jitter(width = 0.2), shape = 2) +
+  geom_smooth(aes(color = Seg), linetype = 1, method = "gam") +
+  geom_smooth(aes(y = F1, color = Seg), linetype = 2, method = "gam") +
+  scale_x_continuous(n.breaks = 5) +
+  scale_color_viridis_d(end = 0.8) +
+  facet_wrap(. ~ Seg, nrow = 2) +
+  theme_ggdist() +
+  labs(title = "Raw output of the script") +
+  theme(legend.position = "none")
+ggsave("figs/vwls_raw.png")
+#this is a raw script and probably not doable, it's just for keeping in mind the turtorial
