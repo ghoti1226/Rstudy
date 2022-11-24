@@ -1,0 +1,13 @@
+library(tidyverse)
+Seg <- read.csv("data/total_f1f2.csv") 
+Gender <- read.csv("data/total_f1f2.csv")
+ggplot(Seg, aes(x = F1, y = F2, color = Gender)) + 
+  geom_point() + 
+  stat_ellipse(level = 0.67) + 
+  scale_x_reverse() + scale_y_reverse() +
+  theme_classic() + 
+  theme(legend.position = "none")
+
+
+
+
